@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <title>Access Terminal</title>
+    <style>
+        :root {
+            --bg: #07080d;
+            --panel: rgba(16, 18, 28, 0.78);
+            --grey-1: #1a1d2b;
+            --grey-2: #2a2e40;
+            --text: #d6dcf5;
+            --muted: #7a82a6;
+            --cyan: #00e5ff;
+            --blue: #2f7bff;
+            --purple: #b14bff;
+            --magenta: #ff2fd6;
+            --glow-cyan: 0 0 6px rgba(0, 229, 255, .7), 0 0 18px rgba(0, 229, 255, .35);
+            --glow-purple: 0 0 6px rgba(177, 75, 255, .7), 0 0 18px rgba(177, 75, 255, .35);
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            min-height: 100%;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Share Tech Mono', ui-monospace, monospace;
+            overflow-x: hidden;
+        }
+
+        /* Animated hardware / circuit canvas */
+        #circuit {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: .6;
+        }
+
+        /* Grid floor + vignette */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse at 20% 0%, rgba(47, 123, 255, .18), transparent 55%),
+                radial-gradient(ellipse at 85% 100%, rgba(177, 75, 255, .22), transparent 55%),
+                radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, .85) 100%);
+        }
+
+        /* CRT scanlines */
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: 3;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, .025) 0px,
+                rgba(255, 255, 255, .025) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+        }
+
+        .wrapper {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 16px;
+        }
+
+        .brand {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            letter-spacing: .35em;
+            font-size: clamp(1.1rem, 3vw, 1.6rem);
+            color: var(--cyan);
+            text-shadow: var(--glow-cyan);
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .brand span { color: var(--purple); text-shadow: var(--glow-purple); }
+
+        .status {
+            color: var(--muted);
+            font-size: .85rem;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+        .status::before {
+            content: "";
+            display: inline-block;
+            width: 8px; height: 8px;
+            margin-right: 8px;
+            border-radius: 50%;
+            background: var(--cyan);
+            box-shadow: var(--glow-cyan);
+            animation: blink 1.4s steps(2) infinite;
+        }
+
+        .terminal {
+            width: 100%;
+            max-width: 1040px;
+            display: flex;
+            align-items: stretch;
+            gap: 0;
+        }
+
+        .panel {
+            flex: 1 1 0;
+            position: relative;
+            background: var(--panel);
+            border: 1px solid var(--grey-2);
+            padding: 36px 32px;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
+        }
+        .panel.login   { box-shadow: inset 0 0 0 1px rgba(0, 229, 255, .25), inset 0 0 40px rgba(0, 229, 255, .06); }
+        .panel.register{ box-shadow: inset 0 0 0 1px rgba(177, 75, 255, .25), inset 0 0 40px rgba(177, 75, 255, .06); }
+
+        /* Corner brackets */
+        .panel::before, .panel::after {
+            content: "";
+            position: absolute;
+            width: 18px; height: 18px;
+            border-color: currentColor;
+            border-style: solid;
+        }
+        .panel::before { top: 10px; left: 10px; border-width: 2px 0 0 2px; }
+        .panel::after  { bottom: 10px; right: 10px; border-width: 0 2px 2px 0; }
+        .panel.login    { color: var(--cyan); }
+        .panel.register { color: var(--purple); }
+        .panel > * { color: var(--text); }
+
+        /* Glowing vertical divider (replaces the red border div) */
+        .divider {
+            width: 2px;
+            margin: 0 28px;
+            background: linear-gradient(to bottom, transparent, var(--cyan), var(--purple), transparent);
+            box-shadow: 0 0 12px rgba(0, 229, 255, .5), 0 0 24px rgba(177, 75, 255, .4);
+        }
+
+        .panel h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.6rem;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .panel.login h1    { color: var(--cyan);   text-shadow: var(--glow-cyan); }
+        .panel.register h1 { color: var(--purple); text-shadow: var(--glow-purple); }
+
+        .panel .sub {
+            color: var(--muted);
+            font-size: .8rem;
+            letter-spacing: .08em;
+        }
+
+        .panel hr {
+            border: 0;
+            height: 1px;
+            margin: 16px 0 24px;
+        }
+        .panel.login hr    { background: linear-gradient(to right, var(--cyan), transparent); box-shadow: var(--glow-cyan); }
+        .panel.register hr { background: linear-gradient(to right, var(--purple), transparent); box-shadow: var(--glow-purple); }
+
+        label {
+            font-size: .78rem;
+            text-transform: uppercase;
+            letter-spacing: .14em;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+        label::before { content: "> "; color: var(--blue); }
+        .form-check-label::before { content: none; }
+
+        .form-control {
+            background: rgba(7, 8, 13, .8);
+            border: 1px solid var(--grey-2);
+            border-radius: 0;
+            color: var(--text);
+            font-family: inherit;
+            height: 44px;
+            caret-color: var(--cyan);
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .form-control::placeholder { color: #4a5070; }
+        .form-control:focus {
+            background: rgba(7, 8, 13, .95);
+            color: #fff;
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 1px var(--cyan), 0 0 16px rgba(0, 229, 255, .35);
+        }
+        .register .form-control { caret-color: var(--purple); }
+        .register .form-control:focus {
+            border-color: var(--purple);
+            box-shadow: 0 0 0 1px var(--purple), 0 0 16px rgba(177, 75, 255, .35);
+        }
+
+        .form-text.text-muted { color: #5a6188 !important; font-size: .75rem; }
+
+        .form-check-input { accent-color: var(--cyan); }
+        .register .form-check-input { accent-color: var(--purple); }
+        .form-check-label { color: var(--muted); font-size: .85rem; text-transform: none; letter-spacing: 0; }
+
+        .btn-neon {
+            position: relative;
+            width: 100%;
+            margin-top: 8px;
+            padding: 12px 18px;
+            border-radius: 0;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            letter-spacing: .25em;
+            text-transform: uppercase;
+            background: transparent;
+            transition: background .2s, color .2s, box-shadow .2s;
+            clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+        }
+        .btn-neon.cyan   { color: var(--cyan);   border: 1px solid var(--cyan);   box-shadow: inset 0 0 12px rgba(0, 229, 255, .25); }
+        .btn-neon.purple { color: var(--purple); border: 1px solid var(--purple); box-shadow: inset 0 0 12px rgba(177, 75, 255, .25); }
+        .btn-neon.cyan:hover, .btn-neon.cyan:focus {
+            background: var(--cyan); color: var(--bg); box-shadow: var(--glow-cyan); outline: none;
+        }
+        .btn-neon.purple:hover, .btn-neon.purple:focus {
+            background: var(--purple); color: var(--bg); box-shadow: var(--glow-purple); outline: none;
+        }
+
+        /* Glitch on headings */
+        .glitch { position: relative; display: inline-block; }
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            left: 0; top: 0;
+            width: 100%;
+            overflow: hidden;
+            opacity: .8;
+        }
+        .glitch::before { color: var(--magenta); animation: glitch-a 3.2s infinite steps(1); }
+        .glitch::after  { color: var(--blue);    animation: glitch-b 2.7s infinite steps(1); }
+
+        @keyframes glitch-a {
+            0%, 92%, 100% { clip-path: inset(0 0 100% 0); transform: none; }
+            93% { clip-path: inset(10% 0 60% 0); transform: translate(-3px, 0); }
+            96% { clip-path: inset(55% 0 20% 0); transform: translate(3px, 0); }
+        }
+        @keyframes glitch-b {
+            0%, 88%, 100% { clip-path: inset(0 0 100% 0); transform: none; }
+            89% { clip-path: inset(40% 0 35% 0); transform: translate(2px, 0); }
+            91% { clip-path: inset(75% 0 5% 0); transform: translate(-2px, 0); }
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .footer-line {
+            margin-top: 28px;
+            font-size: .75rem;
+            color: #4a5070;
+            letter-spacing: .1em;
+            text-align: center;
+        }
+
+        @media (max-width: 767.98px) {
+            .terminal { flex-direction: column; }
+            .divider {
+                width: auto; height: 2px;
+                margin: 24px 0;
+                background: linear-gradient(to right, transparent, var(--cyan), var(--purple), transparent);
+            }
+            .panel { padding: 28px 20px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .glitch::before, .glitch::after, .status::before { animation: none; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="circuit" aria-hidden="true"></canvas>
+
+    <div class="wrapper">
+        <div class="brand">NEXUS<span>//</span>GRID</div>
+        <div class="status">SECURE CHANNEL ESTABLISHED</div>
+
+        <div class="terminal">
+            <!-- Login -->
+            <div class="panel login">
+                <h1 class="glitch" data-text="Login">Login</h1>
+                <div class="sub">Authenticate to jack in.</div>
+                <hr />
+                <form>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Email address</label>
+                        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="user@netrunner.io">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">Password</label>
+                        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="••••••••">
+                    </div>
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                        <label class="form-check-label" for="exampleCheck1">Remember this terminal</label>
+                    </div>
+                    <button type="submit" class="btn btn-neon cyan">Submit</button>
+                </form>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Registration -->
+            <div class="panel register">
+                <h1 class="glitch" data-text="Registration">Registration</h1>
+                <div class="sub">Create a new identity on the grid.</div>
+                <hr />
+                <form>
+                    <div class="form-group">
+                        <label for="regName">Handle</label>
+                        <input type="text" class="form-control" id="regName" placeholder="Your alias">
+                    </div>
+                    <div class="form-group">
+                        <label for="regEmail">Email address</label>
+                        <input type="email" class="form-control" id="regEmail" placeholder="user@netrunner.io">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-sm-6">
+                            <label for="regPassword">Password</label>
+                            <input type="password" class="form-control" id="regPassword" placeholder="••••••••">
+                        </div>
+                        <div class="form-group col-sm-6">
+                            <label for="regConfirm">Confirm</label>
+                            <input type="password" class="form-control" id="regConfirm" placeholder="••••••••">
+                        </div>
+                    </div>
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="regTerms">
+                        <label class="form-check-label" for="regTerms">I accept the terms of the network</label>
+                    </div>
+                    <button type="submit" class="btn btn-neon purple">Register</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="footer-line">SYS.v2.077 &nbsp;|&nbsp; ENCRYPTION: AES-256 &nbsp;|&nbsp; NODE 0x7F3A</div>
+    </div>
+
+    <script>
+        // Floating hardware components linked by circuit traces
+        (function () {
+            var canvas = document.getElementById('circuit');
+            var ctx = canvas.getContext('2d');
+            var CYAN = '#00e5ff', PURPLE = '#b14bff', BLUE = '#2f7bff';
+            var BODY = 'rgba(10, 12, 20, 0.92)';
+            var TYPES = ['cpu', 'ram', 'gpu', 'fan'];
+            var LINK = 280;          // max distance for a trace between two parts
+            var W, H, dpr, board, nodes = [];
+            var mouse = { x: -9999, y: -9999 };
+
+            function rand(a, b) { return a + Math.random() * (b - a); }
+
+            // ---- Static PCB backdrop (drawn once per resize) ----
+            function makeBoard() {
+                board = document.createElement('canvas');
+                board.width = W * dpr;
+                board.height = H * dpr;
+                var b = board.getContext('2d');
+                b.scale(dpr, dpr);
+                b.lineWidth = 1;
+                var step = 40;
+                var dirs = [[1, 0], [0, 1], [-1, 0], [0, -1], [1, 1], [1, -1]];
+                var count = Math.round(W * H / 8000);
+
+                for (var i = 0; i < count; i++) {
+                    var x = Math.round(rand(0, W) / step) * step;
+                    var y = Math.round(rand(0, H) / step) * step;
+                    var col = Math.random() < 0.5 ? '0, 229, 255' : '177, 75, 255';
+                    b.strokeStyle = 'rgba(' + col + ', 0.08)';
+                    b.fillStyle = 'rgba(' + col + ', 0.12)';
+                    b.beginPath();
+                    b.arc(x, y, 2, 0, Math.PI * 2);
+                    b.fill();
+                    b.beginPath();
+                    b.moveTo(x, y);
+                    var segs = 2 + Math.floor(Math.random() * 3);
+                    for (var s = 0; s < segs; s++) {
+                        var d = dirs[Math.random() < 0.8 ? Math.floor(Math.random() * 4) : 4 + Math.floor(Math.random() * 2)];
+                        var len = step * (1 + Math.floor(Math.random() * 3));
+                        x += d[0] * len;
+                        y += d[1] * len;
+                        b.lineTo(x, y);
+                    }
+                    b.stroke();
+                    b.beginPath();
+                    b.arc(x, y, 2.5, 0, Math.PI * 2);
+                    b.stroke();
+                }
+            }
+
+            // ---- Components ----
+            function makeNodes() {
+                var count = Math.max(8, Math.min(22, Math.round(W * H / 65000)));
+                nodes = [];
+                for (var i = 0; i < count; i++) {
+                    var vx = rand(-0.18, 0.18), vy = rand(-0.18, 0.18);
+                    nodes.push({
+                        type: TYPES[i % TYPES.length],
+                        x: rand(0, W), y: rand(0, H),
+                        vx: vx, vy: vy, bvx: vx, bvy: vy,
+                        a: rand(-0.35, 0.35), va: rand(-0.0002, 0.0002),
+                        s: rand(16, 26),
+                        spin: Math.random() * Math.PI * 2,
+                        spinRate: rand(0.004, 0.009),
+                        color: Math.random() < 0.5 ? CYAN : PURPLE,
+                        phase: Math.random()
+                    });
+                }
+            }
+
+            function fan(r, angle, c) {
+                ctx.beginPath();
+                ctx.arc(0, 0, r, 0, Math.PI * 2);
+                ctx.fillStyle = BODY;
+                ctx.fill();
+                ctx.stroke();
+                ctx.save();
+                ctx.rotate(angle);
+                ctx.fillStyle = c;
+                ctx.globalAlpha *= 0.35;
+                for (var k = 0; k < 7; k++) {
+                    ctx.rotate(Math.PI * 2 / 7);
+                    ctx.beginPath();
+                    ctx.moveTo(r * 0.22, 0);
+                    ctx.quadraticCurveTo(r * 0.55, -r * 0.45, r * 0.9, -r * 0.18);
+                    ctx.quadraticCurveTo(r * 0.6, -r * 0.05, r * 0.22, 0);
+                    ctx.fill();
+                }
+                ctx.restore();
+                ctx.beginPath();
+                ctx.arc(0, 0, r * 0.22, 0, Math.PI * 2);
+                ctx.fillStyle = BODY;
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            function drawCPU(n, c) {
+                var h = n.s;
+                ctx.beginPath();
+                for (var i = -3; i <= 3; i++) {
+                    var p = i * h / 4;
+                    ctx.moveTo(p, -h); ctx.lineTo(p, -h - 7);
+                    ctx.moveTo(p, h);  ctx.lineTo(p, h + 7);
+                    ctx.moveTo(-h, p); ctx.lineTo(-h - 7, p);
+                    ctx.moveTo(h, p);  ctx.lineTo(h + 7, p);
+                }
+                ctx.stroke();
+                ctx.fillStyle = BODY;
+                ctx.fillRect(-h, -h, h * 2, h * 2);
+                ctx.strokeRect(-h, -h, h * 2, h * 2);
+                ctx.strokeRect(-h * 0.55, -h * 0.55, h * 1.1, h * 1.1);
+                ctx.beginPath();
+                ctx.arc(-h * 0.75, -h * 0.75, 2, 0, Math.PI * 2);
+                ctx.fillStyle = c;
+                ctx.fill();
+                ctx.font = '700 ' + Math.round(h * 0.42) + 'px Orbitron, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('CPU', 0, 1);
+            }
+
+            function drawRAM(n, c) {
+                var w = n.s * 3.6, h = n.s * 0.95;
+                ctx.fillStyle = BODY;
+                ctx.fillRect(-w / 2, -h / 2, w, h);
+                ctx.strokeRect(-w / 2, -h / 2, w, h);
+                var cw = w / 8 * 0.8, ch = h * 0.42;
+                for (var i = 0; i < 8; i++) {
+                    var cx = -w / 2 + w * (i + 0.5) / 8 - cw / 2;
+                    ctx.strokeRect(cx, -h / 2 + h * 0.14, cw, ch);
+                }
+                // Gold-finger contacts, with a key notch
+                ctx.beginPath();
+                for (var x = -w / 2 + 4; x < w / 2 - 3; x += 3.5) {
+                    if (Math.abs(x - w * 0.1) < 4) continue;
+                    ctx.moveTo(x, h / 2 - 1.5);
+                    ctx.lineTo(x, h / 2 - h * 0.22);
+                }
+                ctx.stroke();
+            }
+
+            function drawGPU(n, c) {
+                var w = n.s * 3.8, h = n.s * 1.6;
+                ctx.fillStyle = BODY;
+                ctx.fillRect(-w / 2, -h / 2, w, h);
+                ctx.strokeRect(-w / 2, -h / 2, w, h);
+                // Bracket and PCIe connector
+                ctx.strokeRect(-w / 2 - 6, -h / 2 - 4, 6, h + 8);
+                ctx.beginPath();
+                for (var x = -w * 0.3; x < w * 0.2; x += 4) {
+                    ctx.moveTo(x, h / 2);
+                    ctx.lineTo(x, h / 2 + 5);
+                }
+                ctx.stroke();
+                // Accent stripe
+                ctx.beginPath();
+                ctx.moveTo(-w / 2 + 6, -h / 2 + 5);
+                ctx.lineTo(w / 2 - 6, -h / 2 + 5);
+                ctx.stroke();
+                ctx.save(); ctx.translate(-w * 0.23, 2); fan(h * 0.36, n.spin, c); ctx.restore();
+                ctx.save(); ctx.translate(w * 0.23, 2);  fan(h * 0.36, -n.spin * 1.1, c); ctx.restore();
+            }
+
+            function drawFan(n, c) {
+                var r = n.s * 1.15;
+                ctx.fillStyle = BODY;
+                ctx.fillRect(-r, -r, r * 2, r * 2);
+                ctx.strokeRect(-r, -r, r * 2, r * 2);
+                ctx.fillStyle = c;
+                [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (p) {
+                    ctx.beginPath();
+                    ctx.arc(p[0] * r * 0.8, p[1] * r * 0.8, 2, 0, Math.PI * 2);
+                    ctx.stroke();
+                });
+                fan(r * 0.88, n.spin, c);
+            }
+
+            var DRAW = { cpu: drawCPU, ram: drawRAM, gpu: drawGPU, fan: drawFan };
+
+            // ---- Traces between nearby parts, with travelling data pulses ----
+            function trace(ax, ay, bx, by, ca, cb, alpha, phase, t) {
+                var mx = (ax + bx) / 2;
+                var grad = ctx.createLinearGradient(ax, ay, bx, by);
+                grad.addColorStop(0, ca);
+                grad.addColorStop(1, cb);
+                ctx.globalAlpha = alpha * 0.7;
+                ctx.strokeStyle = grad;
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                ctx.moveTo(ax, ay);
+                ctx.lineTo(mx, ay);
+                ctx.lineTo(mx, by);
+                ctx.lineTo(bx, by);
+                ctx.stroke();
+
+                // Pulse position along the elbow path
+                var l1 = Math.abs(mx - ax), l2 = Math.abs(by - ay), l3 = Math.abs(bx - mx);
+                var L = l1 + l2 + l3;
+                if (L < 1) return;
+                var d = ((t / 2200 + phase) % 1) * L, px, py;
+                if (d < l1)           { px = ax + Math.sign(mx - ax) * d; py = ay; }
+                else if (d < l1 + l2) { px = mx; py = ay + Math.sign(by - ay) * (d - l1); }
+                else                  { px = mx + Math.sign(bx - mx) * (d - l1 - l2); py = by; }
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowColor = ca;
+                ctx.shadowBlur = 10;
+                ctx.beginPath();
+                ctx.arc(px, py, 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            function update(dt) {
+                var m = 80;
+                nodes.forEach(function (n) {
+                    // Drift away from the cursor, then ease back to cruising speed
+                    var dx = n.x - mouse.x, dy = n.y - mouse.y;
+                    var d = Math.sqrt(dx * dx + dy * dy);
+                    if (d < 170 && d > 0) {
+                        n.vx += dx / d * 0.04;
+                        n.vy += dy / d * 0.04;
+                    }
+                    n.vx += (n.bvx - n.vx) * 0.01;
+                    n.vy += (n.bvy - n.vy) * 0.01;
+                    n.x += n.vx * dt * 0.06;
+                    n.y += n.vy * dt * 0.06;
+                    n.a += n.va * dt;
+                    n.spin += n.spinRate * dt;
+                    if (n.x < -m) n.x = W + m; else if (n.x > W + m) n.x = -m;
+                    if (n.y < -m) n.y = H + m; else if (n.y > H + m) n.y = -m;
+                });
+            }
+
+            function draw(t) {
+                ctx.clearRect(0, 0, W, H);
+                ctx.drawImage(board, 0, 0, W, H);
+
+                var i, j, a, b, dx, dy, d;
+                for (i = 0; i < nodes.length; i++) {
+                    a = nodes[i];
+                    for (j = i + 1; j < nodes.length; j++) {
+                        b = nodes[j];
+                        dx = a.x - b.x; dy = a.y - b.y;
+                        d = Math.sqrt(dx * dx + dy * dy);
+                        if (d < LINK) trace(a.x, a.y, b.x, b.y, a.color, b.color, 1 - d / LINK, a.phase + b.phase, t);
+                    }
+                    // Cursor acts as a probe that wires into nearby parts
+                    dx = a.x - mouse.x; dy = a.y - mouse.y;
+                    d = Math.sqrt(dx * dx + dy * dy);
+                    if (d < LINK * 0.8) trace(mouse.x, mouse.y, a.x, a.y, BLUE, a.color, 1 - d / (LINK * 0.8), a.phase, t * 1.6);
+                }
+                ctx.globalAlpha = 1;
+
+                nodes.forEach(function (n) {
+                    ctx.save();
+                    ctx.translate(n.x, n.y);
+                    ctx.rotate(n.a);
+                    ctx.strokeStyle = n.color;
+                    ctx.lineWidth = 1.3;
+                    ctx.shadowColor = n.color;
+                    ctx.shadowBlur = 8;
+                    DRAW[n.type](n, n.color);
+                    ctx.restore();
+                });
+            }
+
+            function resize() {
+                dpr = Math.min(window.devicePixelRatio || 1, 2);
+                W = window.innerWidth;
+                H = window.innerHeight;
+                canvas.width = W * dpr;
+                canvas.height = H * dpr;
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                makeBoard();
+                if (!nodes.length) makeNodes();
+            }
+
+            resize();
+            window.addEventListener('resize', function () { resize(); if (reduced) draw(0); });
+            window.addEventListener('mousemove', function (e) { mouse.x = e.clientX; mouse.y = e.clientY; });
+            document.addEventListener('mouseleave', function () { mouse.x = mouse.y = -9999; });
+
+            var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (reduced) {
+                draw(0); // single static frame
+            } else {
+                var last = performance.now();
+                (function frame(now) {
+                    var dt = Math.min(50, now - last);
+                    last = now;
+                    update(dt);
+                    draw(now);
+                    requestAnimationFrame(frame);
+                })(last);
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christian Mar M. Aguilar — Portfolio</title>
+    <meta name="description" content="Portfolio of Christian Mar M. Aguilar — Information Technology, AI systems and hardware systems.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #05070a;
+            --bg-2: #0b0f14;
+            --panel: rgba(10, 14, 19, 0.82);
+            --line: #161d27;
+            --line-2: #233042;
+            --text: #d7e2ee;
+            --muted: #7d8b9c;
+            --blue: #00b3ff;
+            --green: #39ff88;
+            --red: #ff4d6d;
+            --amber: #ffd166;
+            --glow-b: 0 0 8px rgba(0, 179, 255, .7), 0 0 24px rgba(0, 179, 255, .35);
+            --glow-g: 0 0 8px rgba(57, 255, 136, .7), 0 0 24px rgba(57, 255, 136, .35);
+            --head: 'Orbitron', sans-serif;
+            --mono: 'JetBrains Mono', ui-monospace, monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 72px;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--mono);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::selection { background: var(--green); color: var(--bg); }
+
+        a:focus-visible, button:focus-visible, input:focus-visible {
+            outline: 2px solid var(--green);
+            outline-offset: 3px;
+        }
+
+        /* ---------- Background layers ---------- */
+        #bg {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: .55;
+            pointer-events: none;
+        }
+
+        .vignette {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse at 15% 0%, rgba(0, 179, 255, .12), transparent 50%),
+                radial-gradient(ellipse at 90% 100%, rgba(57, 255, 136, .08), transparent 50%),
+                radial-gradient(ellipse at center, transparent 35%, rgba(0, 0, 0, .8) 100%);
+        }
+
+        header, main, footer { position: relative; z-index: 2; }
+
+        /* ---------- Nav ---------- */
+        .nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px clamp(16px, 4vw, 48px);
+            border-bottom: 1px solid transparent;
+            transition: background .3s, border-color .3s;
+        }
+        .nav.scrolled, .nav.open {
+            background: rgba(5, 7, 10, .88);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-color: var(--line);
+        }
+
+        .logo {
+            font-family: var(--head);
+            font-weight: 900;
+            font-size: 1.05rem;
+            letter-spacing: .12em;
+            color: var(--text);
+            text-decoration: none;
+        }
+        .logo b { color: var(--blue); text-shadow: var(--glow-b); }
+        .logo i { color: var(--green); font-style: normal; text-shadow: var(--glow-g); }
+
+        .nav-links { display: flex; gap: 32px; list-style: none; }
+        .nav-links a {
+            position: relative;
+            padding: 4px 0;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: .8rem;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            transition: color .25s;
+        }
+        .nav-links a::after {
+            content: "";
+            position: absolute;
+            left: 0; bottom: -2px;
+            width: 0; height: 2px;
+            background: var(--green);
+            box-shadow: var(--glow-g);
+            transition: width .3s;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--text); }
+        .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            width: 40px; height: 40px;
+            padding: 0 9px;
+            background: transparent;
+            border: 1px solid var(--line-2);
+            cursor: pointer;
+        }
+        .nav-toggle span {
+            display: block;
+            height: 2px;
+            background: var(--blue);
+            transition: transform .3s, opacity .3s;
+        }
+        .nav.open .nav-toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .nav.open .nav-toggle span:nth-child(2) { opacity: 0; }
+        .nav.open .nav-toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        /* ---------- Layout ---------- */
+        section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 110px clamp(16px, 5vw, 64px);
+        }
+
+        .sec-head { margin-bottom: 44px; }
+        .sec-head .idx {
+            display: block;
+            color: var(--green);
+            font-size: .78rem;
+            letter-spacing: .22em;
+            margin-bottom: 8px;
+        }
+        .sec-head h2 {
+            font-family: var(--head);
+            font-size: clamp(1.6rem, 4vw, 2.4rem);
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: #fff;
+        }
+        .sec-head p { color: var(--muted); max-width: 60ch; margin-top: 10px; }
+
+        .reveal { opacity: 0; transform: translateY(28px); transition: opacity .8s ease, transform .8s ease; }
+        .reveal.in { opacity: 1; transform: none; }
+
+        /* ---------- Hero ---------- */
+        .hero {
+            min-height: 100vh;
+            min-height: 100svh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-top: 120px;
+        }
+
+        .name-tag {
+            font-family: var(--head);
+            font-weight: 500;
+            font-size: clamp(.85rem, 2.2vw, 1.1rem);
+            letter-spacing: .3em;
+            text-transform: uppercase;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .eyebrow {
+            color: var(--green);
+            font-size: clamp(.85rem, 2vw, 1rem);
+            min-height: 1.6em;
+            margin-bottom: 18px;
+        }
+        .caret {
+            display: inline-block;
+            width: .6em; height: 1.1em;
+            margin-left: 2px;
+            vertical-align: -.18em;
+            background: var(--green);
+            box-shadow: var(--glow-g);
+            animation: blink 1s steps(2) infinite;
+        }
+
+        .hero h1 {
+            font-family: var(--head);
+            font-weight: 900;
+            font-size: clamp(2.5rem, 9vw, 6.2rem);
+            line-height: 1.02;
+            letter-spacing: .02em;
+            text-transform: uppercase;
+            color: #e8f8ff;
+            text-shadow:
+                0 0 2px #fff,
+                0 0 10px var(--blue),
+                0 0 26px var(--blue),
+                0 0 60px rgba(0, 179, 255, .55);
+            animation: flicker 7s infinite;
+        }
+        .hero h1 span {
+            display: block;
+            color: #d9ffe9;
+            text-shadow:
+                0 0 2px #fff,
+                0 0 10px var(--green),
+                0 0 26px var(--green),
+                0 0 60px rgba(57, 255, 136, .45);
+        }
+
+        .lead {
+            max-width: 58ch;
+            margin: 26px 0 38px;
+            color: var(--muted);
+            font-size: clamp(.95rem, 1.8vw, 1.05rem);
+        }
+        .lead strong { color: var(--text); font-weight: 500; }
+
+        .cta { display: flex; flex-wrap: wrap; gap: 16px; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 28px;
+            font-family: var(--head);
+            font-weight: 700;
+            font-size: .8rem;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            text-decoration: none;
+            border: 1px solid var(--blue);
+            border-radius: 2px;
+            transition: background .25s, color .25s, border-color .25s, box-shadow .25s, transform .25s;
+        }
+        .btn.primary { background: var(--blue); color: #00121c; box-shadow: var(--glow-b); }
+        .btn.primary:hover {
+            background: var(--green);
+            border-color: var(--green);
+            box-shadow: var(--glow-g);
+            transform: translateY(-2px);
+        }
+        .btn.ghost { color: var(--blue); background: rgba(0, 179, 255, .06); }
+        .btn.ghost:hover { color: #fff; background: rgba(0, 179, 255, .16); box-shadow: var(--glow-b); transform: translateY(-2px); }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+            max-width: 640px;
+            margin-top: 64px;
+        }
+        .stat { border-left: 2px solid var(--green); padding-left: 14px; }
+        .stat b {
+            display: block;
+            font-family: var(--head);
+            font-size: clamp(1.3rem, 3vw, 1.9rem);
+            color: #fff;
+        }
+        .stat span { font-size: .75rem; color: var(--muted); letter-spacing: .06em; }
+
+        .scroll-hint {
+            margin-top: 56px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: .72rem;
+            letter-spacing: .25em;
+            color: var(--muted);
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+        .scroll-hint i {
+            position: relative;
+            width: 1px; height: 40px;
+            background: var(--line-2);
+            overflow: hidden;
+        }
+        .scroll-hint i::after {
+            content: "";
+            position: absolute;
+            left: 0; top: -40%;
+            width: 1px; height: 40%;
+            background: var(--green);
+            box-shadow: var(--glow-g);
+            animation: drip 1.8s ease-in-out infinite;
+        }
+
+        /* ---------- Diagnostic screen (skills) ---------- */
+        .screen {
+            position: relative;
+            background: var(--panel);
+            border: 1px solid var(--line-2);
+            box-shadow:
+                0 0 0 1px rgba(0, 179, 255, .06),
+                0 30px 80px rgba(0, 0, 0, .6),
+                inset 0 0 60px rgba(0, 179, 255, .04);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            overflow: hidden;
+        }
+        .screen::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, .025) 0 1px, transparent 1px 3px);
+        }
+
+        .titlebar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--line-2);
+            background: rgba(255, 255, 255, .02);
+            font-size: .75rem;
+            color: var(--muted);
+        }
+        .titlebar .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line-2); }
+        .titlebar .dot:first-child { background: var(--red); }
+        .titlebar .dot:nth-child(2) { background: var(--amber); }
+        .titlebar .dot:nth-child(3) { background: var(--green); }
+        .titlebar .name { margin-left: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .titlebar .live { margin-left: auto; color: var(--green); white-space: nowrap; }
+        .titlebar .live::before {
+            content: "";
+            display: inline-block;
+            width: 7px; height: 7px;
+            margin-right: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: var(--glow-g);
+            animation: blink 1.2s steps(2) infinite;
+        }
+
+        .diag-body {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+            gap: 1px;
+            background: var(--line);
+        }
+
+        .module { background: rgba(7, 10, 14, .94); padding: 26px 24px; }
+        .module h3 {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 20px;
+            font-family: var(--head);
+            font-size: .82rem;
+            letter-spacing: .2em;
+            color: var(--blue);
+            text-shadow: 0 0 10px rgba(0, 179, 255, .4);
+        }
+        .module h3 small {
+            font-family: var(--mono);
+            font-weight: 400;
+            font-size: .7rem;
+            letter-spacing: .04em;
+            color: var(--muted);
+            text-shadow: none;
+        }
+
+        .skill { margin-bottom: 16px; }
+        .skill:last-child { margin-bottom: 0; }
+        .skill-head { display: flex; justify-content: space-between; font-size: .85rem; margin-bottom: 6px; }
+        .pct { color: var(--green); font-variant-numeric: tabular-nums; }
+
+        .bar {
+            position: relative;
+            height: 10px;
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid var(--line-2);
+            overflow: hidden;
+        }
+        .bar i {
+            display: block;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, var(--blue), var(--green));
+            -webkit-mask: repeating-linear-gradient(90deg, #000 0 6px, transparent 6px 8px);
+                    mask: repeating-linear-gradient(90deg, #000 0 6px, transparent 6px 8px);
+            transition: width 1.4s cubic-bezier(.2, .8, .2, 1);
+        }
+        .bar::after {
+            content: "";
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 40px;
+            left: -40px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .25), transparent);
+            animation: sweep 3.2s linear infinite;
+        }
+
+        .diag-foot {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 28px;
+            padding: 12px 16px;
+            border-top: 1px solid var(--line-2);
+            font-size: .74rem;
+            color: var(--muted);
+        }
+        .diag-foot .ok { color: var(--green); }
+
+        /* ---------- Projects ---------- */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 28px 26px;
+            background: var(--panel);
+            border: 1px solid var(--line-2);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            overflow: hidden;
+            transition: transform .35s, border-color .35s, box-shadow .35s;
+        }
+        .card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), rgba(0, 179, 255, .15), transparent 45%);
+            opacity: 0;
+            transition: opacity .35s;
+        }
+        .card::after {
+            content: "";
+            position: absolute;
+            top: 0; right: 0;
+            width: 28px; height: 28px;
+            border-top: 2px solid var(--blue);
+            border-right: 2px solid var(--blue);
+            opacity: .35;
+            transition: opacity .35s, box-shadow .35s;
+        }
+        .card:hover {
+            transform: translateY(-6px);
+            border-color: var(--blue);
+            box-shadow: 0 0 0 1px var(--blue), 0 0 28px rgba(0, 179, 255, .35), 0 24px 60px rgba(0, 0, 0, .55);
+        }
+        .card:hover::before { opacity: 1; }
+        .card:hover::after { opacity: 1; }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            font-size: .72rem;
+            letter-spacing: .1em;
+            color: var(--muted);
+        }
+        .card-meta .status { color: var(--green); }
+
+        .card h3 {
+            margin-bottom: 10px;
+            font-family: var(--head);
+            font-size: 1.12rem;
+            letter-spacing: .06em;
+            color: #fff;
+            transition: text-shadow .35s;
+        }
+        .card:hover h3 { text-shadow: var(--glow-b); }
+        .card p { flex: 1; margin-bottom: 22px; color: var(--muted); font-size: .88rem; }
+
+        .tags { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin-bottom: 22px; }
+        .tags li {
+            padding: 4px 10px;
+            font-size: .7rem;
+            color: var(--green);
+            border: 1px solid rgba(57, 255, 136, .3);
+            background: rgba(57, 255, 136, .05);
+            transition: box-shadow .35s, background .35s, border-color .35s;
+        }
+        .card:hover .tags li {
+            border-color: rgba(57, 255, 136, .7);
+            background: rgba(57, 255, 136, .1);
+            box-shadow: 0 0 10px rgba(57, 255, 136, .35);
+        }
+
+        .card .more {
+            position: relative;
+            z-index: 1;
+            align-self: flex-start;
+            color: var(--blue);
+            text-decoration: none;
+            font-size: .8rem;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            transition: color .25s, letter-spacing .25s;
+        }
+        .card .more:hover { color: var(--green); letter-spacing: .2em; }
+
+        /* ---------- Terminal contact ---------- */
+        .terminal {
+            max-width: 880px;
+            margin: 0 auto;
+            background: rgba(3, 5, 7, .94);
+            border: 1px solid var(--line-2);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, .7), 0 0 40px rgba(57, 255, 136, .06);
+            cursor: text;
+            transition: border-color .3s, box-shadow .3s;
+        }
+        .terminal:focus-within {
+            border-color: rgba(57, 255, 136, .55);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, .7), 0 0 40px rgba(57, 255, 136, .15);
+        }
+
+        .term-out {
+            height: clamp(280px, 46vh, 400px);
+            overflow-y: auto;
+            padding: 20px;
+            font-size: .9rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--line-2) transparent;
+        }
+        .term-out::-webkit-scrollbar { width: 8px; }
+        .term-out::-webkit-scrollbar-thumb { background: var(--line-2); }
+
+        .line { margin-bottom: 4px; white-space: pre-wrap; word-break: break-word; }
+        .line.sys  { color: var(--blue); }
+        .line.ok   { color: var(--green); }
+        .line.err  { color: var(--red); }
+        .line.warn { color: var(--amber); }
+        .line.dim  { color: var(--muted); }
+        .line.user { color: #fff; }
+        .line .ps  { color: var(--green); }
+        .line a    { color: var(--green); text-shadow: var(--glow-g); }
+
+        .term-form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 20px;
+            border-top: 1px solid var(--line-2);
+        }
+        #term-prompt { color: var(--green); white-space: nowrap; font-size: .9rem; }
+        #term-input {
+            flex: 1;
+            min-width: 0;
+            background: transparent;
+            border: 0;
+            outline: 0;
+            color: #fff;
+            font: inherit;
+            font-size: 16px; /* prevents zoom on iOS */
+            caret-color: var(--green);
+        }
+        #term-input::placeholder { color: #3a4656; }
+        #term-input:disabled { opacity: .5; }
+
+        .term-hint { margin-top: 14px; text-align: center; font-size: .75rem; color: var(--muted); }
+        .term-hint code { color: var(--green); }
+
+        /* ---------- Footer ---------- */
+        footer {
+            border-top: 1px solid var(--line);
+            background: rgba(5, 7, 10, .85);
+        }
+        .foot {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 28px clamp(16px, 5vw, 64px);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            font-size: .78rem;
+            color: var(--muted);
+        }
+        .foot nav { display: flex; gap: 22px; }
+        .foot a { color: var(--muted); text-decoration: none; transition: color .25s, text-shadow .25s; }
+        .foot a:hover { color: var(--blue); text-shadow: var(--glow-b); }
+
+        /* ---------- Animations ---------- */
+        @keyframes blink { 50% { opacity: 0; } }
+        @keyframes flicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; }
+            20%, 24%, 55% { opacity: .72; }
+        }
+        @keyframes drip { 0% { top: -40%; } 100% { top: 100%; } }
+        @keyframes sweep { 0% { left: -40px; } 100% { left: 100%; } }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 760px) {
+            .nav-toggle { display: flex; }
+            .nav-links {
+                position: absolute;
+                top: 100%; left: 0; right: 0;
+                flex-direction: column;
+                gap: 0;
+                max-height: 0;
+                overflow: hidden;
+                background: rgba(5, 7, 10, .96);
+                border-bottom: 1px solid var(--line);
+                transition: max-height .35s ease;
+            }
+            .nav.open .nav-links { max-height: 320px; }
+            .nav-links a { display: block; padding: 14px 16px; }
+            .nav-links a::after { display: none; }
+            .nav-links a.active { color: var(--green); }
+
+            section { padding-top: 80px; padding-bottom: 80px; }
+            .diag-body { grid-template-columns: 1fr; }
+            .module { padding: 22px 16px; }
+            .hero-stats { gap: 12px; margin-top: 48px; }
+            .titlebar .live { display: none; }
+            .term-out { padding: 16px; font-size: .85rem; }
+            .term-form { padding: 12px 16px; }
+        }
+
+        @media (max-width: 420px) {
+            #term-prompt .host { display: none; }
+            .btn { width: 100%; justify-content: center; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+            .reveal { opacity: 1; transform: none; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg" aria-hidden="true"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <!-- ================= NAV ================= -->
+    <header class="nav" id="nav">
+        <a href="#home" class="logo">&lt;<b>AI</b>/<i>HW</i>&gt;</a>
+        <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-links">
+            <span></span><span></span><span></span>
+        </button>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#specs">Specs</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </header>
+
+    <main>
+        <!-- ================= HERO ================= -->
+        <section class="hero" id="home">
+            <p class="name-tag">Christian Mar M. Aguilar</p>
+            <p class="eyebrow">&gt; <span id="role"></span><span class="caret"></span></p>
+            <h1>AI Systems<span>&amp; Hardware</span></h1>
+            <p class="lead">
+                <strong>Hero of my own.</strong> Information Technology — AI systems work on hardware systems,
+                and I work on both: from the machine itself to the networks and software that run on it.
+            </p>
+            <div class="cta">
+                <a href="#projects" class="btn primary">View Projects &rarr;</a>
+                <a href="#contact" class="btn ghost">Open Terminal</a>
+            </div>
+            <a href="#specs" class="scroll-hint"><i></i>Scroll to run diagnostics</a>
+        </section>
+
+        <!-- ================= SPECS ================= -->
+        <section id="specs">
+            <div class="sec-head reveal">
+                <span class="idx">01 // SYSTEM SPECS</span>
+                <h2>Hardware Diagnostic</h2>
+                <p>Live readout of installed modules.</p>
+            </div>
+
+            <div class="screen reveal" id="diag">
+                <div class="titlebar">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    <span class="name">sysdiag.exe — scanning modules</span>
+                    <span class="live">LIVE</span>
+                </div>
+
+                <div class="diag-body">
+                    <div class="module">
+                        <h3>SYSTEMS <small>slot_0</small></h3>
+                        <div class="skill"><div class="skill-head"><span>Computer System Hardware</span><span class="pct">80%</span></div><div class="bar"><i></i></div></div>
+                        <div class="skill"><div class="skill-head"><span>Computer System Software</span><span class="pct">75%</span></div><div class="bar"><i></i></div></div>
+                        <div class="skill"><div class="skill-head"><span>Networking</span><span class="pct">77%</span></div><div class="bar"><i></i></div></div>
+                    </div>
+
+                    <div class="module">
+                        <h3>PROGRAMMING <small>slot_1</small></h3>
+                        <div class="skill"><div class="skill-head"><span>Java</span><span class="pct">78%</span></div><div class="bar"><i></i></div></div>
+                        <div class="skill"><div class="skill-head"><span>PHP</span><span class="pct">80%</span></div><div class="bar"><i></i></div></div>
+                    </div>
+
+                    <div class="module">
+                        <h3>WEB &amp; DATA <small>slot_2</small></h3>
+                        <div class="skill"><div class="skill-head"><span>HTML</span><span class="pct">77%</span></div><div class="bar"><i></i></div></div>
+                        <div class="skill"><div class="skill-head"><span>MySQL</span><span class="pct">81%</span></div><div class="bar"><i></i></div></div>
+                    </div>
+                </div>
+
+                <div class="diag-foot">
+                    <span>STATUS: <span class="ok">ALL SYSTEMS NOMINAL</span></span>
+                    <span>CORE TEMP: <span id="temp">42</span>°C</span>
+                    <span>UPTIME: <span id="uptime">00:00:00</span></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PROJECTS ================= -->
+        <section id="projects">
+            <div class="sec-head reveal">
+                <span class="idx">02 // PROJECTS</span>
+                <h2>Deployed Builds</h2>
+                <p>School projects built with PHP, MySQL and HTML — both live online.</p>
+            </div>
+
+            <div class="grid">
+                <article class="card reveal">
+                    <div class="card-meta"><span>PRJ-001</span><span class="status">● SCHOOL PROJECT</span></div>
+                    <h3>prjctims</h3>
+                    <p>A simple inventory management system for keeping track of items and stock, backed by a MySQL database.</p>
+                    <ul class="tags"><li>HTML</li><li>MySQL</li><li>PHP</li></ul>
+                    <a href="https://prjctims.infinityfree.me/dashboard" class="more" target="_blank" rel="noopener">Live demo &rarr;</a>
+                </article>
+
+                <article class="card reveal">
+                    <div class="card-meta"><span>PRJ-002</span><span class="status">● SCHOOL PROJECT</span></div>
+                    <h3>Cosmo Approval Entry System</h3>
+                    <p>A simple data entry system that can enter, modify and delete records.</p>
+                    <ul class="tags"><li>HTML</li><li>MySQL</li><li>PHP</li></ul>
+                    <a href="https://cosmoapprovalentrysystem.infinityfree.me/login.php" class="more" target="_blank" rel="noopener">Live demo &rarr;</a>
+                </article>
+            </div>
+            <article class="card reveal">
+                    <div class="card-meta"><span>PRJ-002</span><span class="status">● SCHOOL PROJECT</span></div>
+                    <h3>Dental Production System</h3>
+                    <p>A web application that convert your report into systematic,synchronize charting with UI</p>
+                    <ul class="tags"><li>Python</li></ul>
+                    <a href="http://localhost:8501/" class="more" target="_blank" rel="noopener">Live demo &rarr;</a>
+                </article>
+            </div>
+        </section>
+
+        <!-- ================= CONTACT ================= -->
+        <section id="contact">
+            <div class="sec-head reveal">
+                <span class="idx">03 // CONTACT</span>
+                <h2>Open a Connection</h2>
+                <p>Answer the prompts below to compose a message. Type <code style="color:var(--green)">help</code> for commands.</p>
+            </div>
+
+            <div class="terminal reveal" id="terminal">
+                <div class="titlebar">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    <span class="name">guest@ai-hw: ~/contact</span>
+                    <span class="live">SECURE</span>
+                </div>
+                <div class="term-out" id="term-out" role="log" aria-live="polite"></div>
+                <form class="term-form" id="term-form" autocomplete="off">
+                    <label for="term-input" id="term-prompt"><span class="host">guest@ai-hw:</span>~$</label>
+                    <input id="term-input" type="text" spellcheck="false" placeholder="initializing...">
+                </form>
+            </div>
+            <p class="term-hint">Commands: <code>help</code> · <code>clear</code> · <code>restart</code> · <code>email</code></p>
+        </section>
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer>
+        <div class="foot">
+            <span>© 2026 Christian Mar M. Aguilar · Built with HTML, CSS &amp; Canvas</span>
+            <nav>
+                <a href="https://prjctims.infinityfree.me/dashboard" target="_blank" rel="noopener">prjctims</a>
+                <a href="https://cosmoapprovalentrysystem.infinityfree.me/login.php" target="_blank" rel="noopener">Cosmo</a>
+                <a href="mailto:c.aguilar0209@yahoo.com">Email</a>
+            </nav>
+        </div>
+    </footer>
+
+    <script>
+        const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const CONTACT_EMAIL = 'c.aguilar0209@yahoo.com';
+
+        /* =====================================================
+           Background: hardware parts assembling and floating,
+           wired together by circuit traces carrying data pulses
+           ===================================================== */
+        (function () {
+            const canvas = document.getElementById('bg');
+            const ctx = canvas.getContext('2d');
+            const BLUE = '#00b3ff', GREEN = '#39ff88';
+            const BODY = 'rgba(8, 11, 15, 0.92)';
+            const TYPES = ['cpu', 'ram', 'board', 'node'];
+            const LINK = 260;
+            const mouse = { x: -9999, y: -9999 };
+            let W, H, dpr, board, nodes = [];
+
+            const rand = (a, b) => a + Math.random() * (b - a);
+
+            // Faint static PCB pattern, drawn once per resize
+            function makeBoard() {
+                board = document.createElement('canvas');
+                board.width = W * dpr;
+                board.height = H * dpr;
+                const b = board.getContext('2d');
+                b.scale(dpr, dpr);
+                b.lineWidth = 1;
+                const step = 40;
+                const dirs = [[1, 0], [0, 1], [-1, 0], [0, -1], [1, 1], [1, -1]];
+                const count = Math.round(W * H / 8000);
+
+                for (let i = 0; i < count; i++) {
+                    let x = Math.round(rand(0, W) / step) * step;
+                    let y = Math.round(rand(0, H) / step) * step;
+                    const col = Math.random() < 0.6 ? '0, 179, 255' : '57, 255, 136';
+                    b.strokeStyle = 'rgba(' + col + ', 0.07)';
+                    b.fillStyle = 'rgba(' + col + ', 0.12)';
+                    b.beginPath();
+                    b.arc(x, y, 2, 0, Math.PI * 2);
+                    b.fill();
+                    b.beginPath();
+                    b.moveTo(x, y);
+                    const segs = 2 + Math.floor(Math.random() * 3);
+                    for (let s = 0; s < segs; s++) {
+                        const d = dirs[Math.random() < 0.8 ? Math.floor(Math.random() * 4) : 4 + Math.floor(Math.random() * 2)];
+                        const len = step * (1 + Math.floor(Math.random() * 3));
+                        x += d[0] * len;
+                        y += d[1] * len;
+                        b.lineTo(x, y);
+                    }
+                    b.stroke();
+                    b.beginPath();
+                    b.arc(x, y, 2.5, 0, Math.PI * 2);
+                    b.stroke();
+                }
+            }
+
+            function makeNodes() {
+                const count = Math.max(7, Math.min(20, Math.round(W * H / 70000)));
+                nodes = [];
+                for (let i = 0; i < count; i++) {
+                    const vx = rand(-0.16, 0.16), vy = rand(-0.16, 0.16);
+                    nodes.push({
+                        type: TYPES[i % TYPES.length],
+                        x: rand(0, W), y: rand(0, H),
+                        vx, vy, bvx: vx, bvy: vy,
+                        a: rand(-0.3, 0.3), va: rand(-0.00015, 0.00015),
+                        s: rand(16, 25),
+                        spin: Math.random() * Math.PI * 2,
+                        color: Math.random() < 0.6 ? BLUE : GREEN,
+                        phase: Math.random(),
+                        // "Assembly" intro: each part flies in from an offset and scales up
+                        born: 250 + i * 150,
+                        ox: rand(-180, 180), oy: rand(-180, 180), or: rand(-1.5, 1.5),
+                        e: 0, dx: 0, dy: 0
+                    });
+                }
+            }
+
+            // ---- Component drawings (origin = component centre) ----
+            function drawCPU(n, c) {
+                const h = n.s;
+                ctx.beginPath();
+                for (let i = -3; i <= 3; i++) {
+                    const p = i * h / 4;
+                    ctx.moveTo(p, -h); ctx.lineTo(p, -h - 7);
+                    ctx.moveTo(p, h);  ctx.lineTo(p, h + 7);
+                    ctx.moveTo(-h, p); ctx.lineTo(-h - 7, p);
+                    ctx.moveTo(h, p);  ctx.lineTo(h + 7, p);
+                }
+                ctx.stroke();
+                ctx.fillStyle = BODY;
+                ctx.fillRect(-h, -h, h * 2, h * 2);
+                ctx.strokeRect(-h, -h, h * 2, h * 2);
+                ctx.strokeRect(-h * 0.55, -h * 0.55, h * 1.1, h * 1.1);
+                ctx.fillStyle = c;
+                ctx.beginPath();
+                ctx.arc(-h * 0.75, -h * 0.75, 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.font = '700 ' + Math.round(h * 0.4) + 'px Orbitron, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('CPU', 0, 1);
+            }
+
+            function drawRAM(n) {
+                const w = n.s * 3.6, h = n.s * 0.95;
+                ctx.fillStyle = BODY;
+                ctx.fillRect(-w / 2, -h / 2, w, h);
+                ctx.strokeRect(-w / 2, -h / 2, w, h);
+                const cw = w / 8 * 0.8, ch = h * 0.42;
+                for (let i = 0; i < 8; i++) {
+                    ctx.strokeRect(-w / 2 + w * (i + 0.5) / 8 - cw / 2, -h / 2 + h * 0.14, cw, ch);
+                }
+                // Edge contacts with a key notch
+                ctx.beginPath();
+                for (let x = -w / 2 + 4; x < w / 2 - 3; x += 3.5) {
+                    if (Math.abs(x - w * 0.1) < 4) continue;
+                    ctx.moveTo(x, h / 2 - 1.5);
+                    ctx.lineTo(x, h / 2 - h * 0.22);
+                }
+                ctx.stroke();
+            }
+
+            function drawBoard(n, c) {
+                const w = n.s * 3.1, h = n.s * 2.1;
+                ctx.fillStyle = BODY;
+                ctx.fillRect(-w / 2, -h / 2, w, h);
+                ctx.strokeRect(-w / 2, -h / 2, w, h);
+                [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(p => {
+                    ctx.beginPath();
+                    ctx.arc(p[0] * (w / 2 - 6), p[1] * (h / 2 - 6), 2.5, 0, Math.PI * 2);
+                    ctx.stroke();
+                });
+                ctx.strokeRect(-w * 0.32, -h * 0.3, w * 0.22, h * 0.34);
+                ctx.strokeRect(w * 0.06, -h * 0.32, w * 0.26, h * 0.3);
+                ctx.beginPath();
+                ctx.moveTo(-w * 0.21, h * 0.04); ctx.lineTo(-w * 0.21, h * 0.2); ctx.lineTo(w * 0.19, h * 0.2); ctx.lineTo(w * 0.19, -h * 0.02);
+                ctx.moveTo(-w * 0.1, -h * 0.14); ctx.lineTo(w * 0.06, -h * 0.14);
+                ctx.moveTo(-w * 0.42, h * 0.33); ctx.lineTo(-w * 0.02, h * 0.33); ctx.lineTo(w * 0.04, h * 0.38); ctx.lineTo(w * 0.4, h * 0.38);
+                ctx.stroke();
+                ctx.fillStyle = c;
+                [[-w * 0.42, h * 0.33], [w * 0.4, h * 0.38], [w * 0.19, h * 0.2]].forEach(p => {
+                    ctx.beginPath();
+                    ctx.arc(p[0], p[1], 1.8, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            }
+
+            function drawNode(n, c, t) {
+                const r = n.s * 0.75;
+                ctx.beginPath();
+                for (let k = 0; k < 6; k++) {
+                    const ang = Math.PI / 3 * k + Math.PI / 6;
+                    const x = r * Math.cos(ang), y = r * Math.sin(ang);
+                    if (k) ctx.lineTo(x, y); else ctx.moveTo(x, y);
+                }
+                ctx.closePath();
+                ctx.fillStyle = BODY;
+                ctx.fill();
+                ctx.stroke();
+                // Rotating orbit ring
+                ctx.setLineDash([3, 5]);
+                ctx.lineDashOffset = -n.spin * 12;
+                ctx.beginPath();
+                ctx.arc(0, 0, r * 1.5, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                // Pulsing core
+                const pr = r * 0.32 * (1 + 0.25 * Math.sin(t / 350 + n.phase * Math.PI * 2));
+                ctx.fillStyle = c;
+                ctx.beginPath();
+                ctx.arc(0, 0, pr, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            const DRAW = { cpu: drawCPU, ram: drawRAM, board: drawBoard, node: drawNode };
+
+            // Elbow-routed trace with a travelling data pulse
+            function trace(ax, ay, bx, by, ca, cb, alpha, phase, t) {
+                const mx = (ax + bx) / 2;
+                const grad = ctx.createLinearGradient(ax, ay, bx, by);
+                grad.addColorStop(0, ca);
+                grad.addColorStop(1, cb);
+                ctx.globalAlpha = alpha * 0.7;
+                ctx.strokeStyle = grad;
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                ctx.moveTo(ax, ay);
+                ctx.lineTo(mx, ay);
+                ctx.lineTo(mx, by);
+                ctx.lineTo(bx, by);
+                ctx.stroke();
+
+                const l1 = Math.abs(mx - ax), l2 = Math.abs(by - ay), l3 = Math.abs(bx - mx);
+                const L = l1 + l2 + l3;
+                if (L < 1) return;
+                const d = ((t / 2200 + phase) % 1) * L;
+                let px, py;
+                if (d < l1)           { px = ax + Math.sign(mx - ax) * d; py = ay; }
+                else if (d < l1 + l2) { px = mx; py = ay + Math.sign(by - ay) * (d - l1); }
+                else                  { px = mx + Math.sign(bx - mx) * (d - l1 - l2); py = by; }
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowColor = ca;
+                ctx.shadowBlur = 10;
+                ctx.beginPath();
+                ctx.arc(px, py, 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            function update(dt) {
+                const m = 80;
+                for (const n of nodes) {
+                    const dx = n.x - mouse.x, dy = n.y - mouse.y;
+                    const d = Math.hypot(dx, dy);
+                    if (d < 170 && d > 0) {
+                        n.vx += dx / d * 0.04;
+                        n.vy += dy / d * 0.04;
+                    }
+                    n.vx += (n.bvx - n.vx) * 0.01;
+                    n.vy += (n.bvy - n.vy) * 0.01;
+                    n.x += n.vx * dt * 0.06;
+                    n.y += n.vy * dt * 0.06;
+                    n.a += n.va * dt;
+                    n.spin += 0.004 * dt;
+                    if (n.x < -m) n.x = W + m; else if (n.x > W + m) n.x = -m;
+                    if (n.y < -m) n.y = H + m; else if (n.y > H + m) n.y = -m;
+                }
+            }
+
+            function draw(t) {
+                ctx.clearRect(0, 0, W, H);
+                ctx.drawImage(board, 0, 0, W, H);
+
+                for (const n of nodes) {
+                    const k = Math.min(1, Math.max(0, (t - n.born) / 1100));
+                    n.e = 1 - Math.pow(1 - k, 3);
+                    n.dx = n.x + n.ox * (1 - n.e);
+                    n.dy = n.y + n.oy * (1 - n.e);
+                }
+
+                for (let i = 0; i < nodes.length; i++) {
+                    const a = nodes[i];
+                    if (a.e <= 0) continue;
+                    for (let j = i + 1; j < nodes.length; j++) {
+                        const b = nodes[j];
+                        if (b.e <= 0) continue;
+                        const d = Math.hypot(a.dx - b.dx, a.dy - b.dy);
+                        if (d < LINK) trace(a.dx, a.dy, b.dx, b.dy, a.color, b.color, (1 - d / LINK) * Math.min(a.e, b.e), a.phase + b.phase, t);
+                    }
+                    // Cursor acts as a probe that wires into nearby parts
+                    const dm = Math.hypot(a.dx - mouse.x, a.dy - mouse.y);
+                    if (dm < LINK * 0.8) trace(mouse.x, mouse.y, a.dx, a.dy, GREEN, a.color, (1 - dm / (LINK * 0.8)) * a.e, a.phase, t * 1.6);
+                }
+
+                for (const n of nodes) {
+                    if (n.e <= 0) continue;
+                    ctx.save();
+                    ctx.globalAlpha = n.e;
+                    ctx.translate(n.dx, n.dy);
+                    ctx.rotate(n.a + n.or * (1 - n.e));
+                    ctx.scale(n.e, n.e);
+                    ctx.strokeStyle = n.color;
+                    ctx.lineWidth = 1.3;
+                    ctx.shadowColor = n.color;
+                    ctx.shadowBlur = 8;
+                    DRAW[n.type](n, n.color, t);
+                    ctx.restore();
+                }
+                ctx.globalAlpha = 1;
+            }
+
+            function resize() {
+                dpr = Math.min(window.devicePixelRatio || 1, 2);
+                W = window.innerWidth;
+                H = window.innerHeight;
+                canvas.width = W * dpr;
+                canvas.height = H * dpr;
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                makeBoard();
+                if (!nodes.length) makeNodes();
+            }
+
+            resize();
+            window.addEventListener('resize', () => { resize(); if (REDUCED) draw(1e6); });
+            window.addEventListener('pointermove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+            document.addEventListener('pointerleave', () => { mouse.x = mouse.y = -9999; });
+
+            if (REDUCED) {
+                draw(1e6); // fully assembled, static frame
+            } else {
+                const t0 = performance.now();
+                let last = t0;
+                (function frame(now) {
+                    const dt = Math.min(50, now - last);
+                    last = now;
+                    update(dt);
+                    draw(now - t0);
+                    requestAnimationFrame(frame);
+                })(t0);
+            }
+        })();
+
+        /* ============ Navigation ============ */
+        (function () {
+            const nav = document.getElementById('nav');
+            const toggle = nav.querySelector('.nav-toggle');
+            const links = [...nav.querySelectorAll('.nav-links a')];
+
+            const setOpen = open => {
+                nav.classList.toggle('open', open);
+                toggle.setAttribute('aria-expanded', String(open));
+            };
+            toggle.addEventListener('click', () => setOpen(!nav.classList.contains('open')));
+            links.forEach(a => a.addEventListener('click', () => setOpen(false)));
+
+            const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 20);
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+
+            // Highlight the section currently in view
+            const spy = new IntersectionObserver(entries => {
+                entries.forEach(e => {
+                    if (e.isIntersecting) {
+                        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+                    }
+                });
+            }, { rootMargin: '-45% 0px -50% 0px' });
+            document.querySelectorAll('main section').forEach(s => spy.observe(s));
+        })();
+
+        /* ============ Reveal on scroll + card spotlight ============ */
+        (function () {
+            const revealer = new IntersectionObserver((entries, obs) => {
+                entries.forEach(e => {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('in');
+                        obs.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.12 });
+            document.querySelectorAll('.reveal').forEach(el => revealer.observe(el));
+
+            document.querySelectorAll('.card').forEach(card => {
+                card.addEventListener('pointermove', e => {
+                    const r = card.getBoundingClientRect();
+                    card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+                    card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+                });
+            });
+        })();
+
+        /* ============ Hero typewriter ============ */
+        (function () {
+            const roles = [
+                'information technology',
+                'computer hardware & software',
+                'networking',
+                'Java & PHP programming'
+            ];
+            const el = document.getElementById('role');
+            if (REDUCED) { el.textContent = roles[0]; return; }
+            let ri = 0, ci = 0, deleting = false;
+            (function type() {
+                const word = roles[ri];
+                ci += deleting ? -1 : 1;
+                el.textContent = word.slice(0, ci);
+                let delay = deleting ? 35 : 70;
+                if (!deleting && ci === word.length) { deleting = true; delay = 1800; }
+                else if (deleting && ci === 0) { deleting = false; ri = (ri + 1) % roles.length; delay = 350; }
+                setTimeout(type, delay);
+            })();
+        })();
+
+        /* ============ Diagnostic skill bars ============ */
+        (function () {
+            const diag = document.getElementById('diag');
+            const obs = new IntersectionObserver((entries, o) => {
+                if (!entries[0].isIntersecting) return;
+                o.disconnect();
+                // Each module "loads" to 100%, then reports LOADED (no self-rating)
+                diag.querySelectorAll('.skill').forEach((sk, i) => {
+                    const bar = sk.querySelector('.bar i');
+                    const pct = sk.querySelector('.pct');
+                    setTimeout(() => {
+                        bar.style.width = '100%';
+                        if (REDUCED) { pct.textContent = '✓ LOADED'; return; }
+                        const start = performance.now(), dur = 1400;
+                        (function tick(now) {
+                            const p = Math.min(1, (now - start) / dur);
+                            pct.textContent = p < 1 ? Math.round(100 * (1 - Math.pow(1 - p, 3))) + '%' : '✓ LOADED';
+                            if (p < 1) requestAnimationFrame(tick);
+                        })(start);
+                    }, REDUCED ? 0 : 200 + i * 120);
+                });
+            }, { threshold: 0.25 });
+            obs.observe(diag);
+
+            // Live footer readouts
+            const temp = document.getElementById('temp');
+            const uptime = document.getElementById('uptime');
+            const started = Date.now();
+            const pad = v => String(v).padStart(2, '0');
+            setInterval(() => {
+                const s = Math.floor((Date.now() - started) / 1000);
+                uptime.textContent = pad(Math.floor(s / 3600)) + ':' + pad(Math.floor(s / 60) % 60) + ':' + pad(s % 60);
+                temp.textContent = 40 + Math.floor(Math.random() * 6);
+            }, 1000);
+        })();
+
+        /* ============ Terminal contact ============ */
+        (function () {
+            const term = document.getElementById('terminal');
+            const out = document.getElementById('term-out');
+            const form = document.getElementById('term-form');
+            const input = document.getElementById('term-input');
+            const promptText = document.getElementById('term-prompt').textContent.trim();
+
+            const steps = [
+                { key: 'name', ask: 'Identify yourself. Enter your name:' },
+                { key: 'email', ask: 'Enter a return address (email):',
+                  check: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || 'ERR: invalid address format. Try again.' },
+                { key: 'message', ask: 'Compose your message, then press Enter:' }
+            ];
+            let step = 0, data = {}, mode = 'boot', busy = false;
+
+            const wait = ms => new Promise(r => setTimeout(r, REDUCED ? 0 : ms));
+
+            function print(text, cls) {
+                const line = document.createElement('div');
+                line.className = 'line ' + (cls || '');
+                line.textContent = text;
+                out.appendChild(line);
+                out.scrollTop = out.scrollHeight;
+                return line;
+            }
+
+            function echo(value) {
+                const line = print('', 'user');
+                const ps = document.createElement('span');
+                ps.className = 'ps';
+                ps.textContent = promptText + ' ';
+                line.append(ps, document.createTextNode(value));
+            }
+
+            async function sequence(lines, refocus) {
+                busy = true;
+                input.disabled = true;
+                for (const [text, cls, delay] of lines) {
+                    await wait(delay);
+                    print(text, cls);
+                }
+                busy = false;
+                input.disabled = false;
+                if (refocus) input.focus({ preventScroll: true });
+            }
+
+            function ask() {
+                print(steps[step].ask, 'sys');
+                input.placeholder = steps[step].key + '...';
+            }
+
+            function restart() {
+                step = 0;
+                data = {};
+                mode = 'form';
+                ask();
+            }
+
+            async function boot() {
+                await sequence([
+                    ['AI-HW SecureShell v2.4', 'ok', 150],
+                    ['Handshake .............. [OK]', 'dim', 300],
+                    ['Encryption ............. [AES-256]', 'dim', 250],
+                    ["Connection established. Type 'help' for commands.", 'dim', 300]
+                ]);
+                restart();
+            }
+
+            async function transmit() {
+                mode = 'done';
+                await sequence([
+                    ['Packaging payload ...... [OK]', 'dim', 300],
+                    ['Encrypting ............. [OK]', 'dim', 400],
+                    ['Routing to mail client . [OK]', 'dim', 400],
+                    ['Message ready, ' + data.name + '. Opening your mail client to send it.', 'ok', 300]
+                ], true);
+                const href = 'mailto:' + CONTACT_EMAIL +
+                    '?subject=' + encodeURIComponent('Portfolio contact from ' + data.name) +
+                    '&body=' + encodeURIComponent(data.message + '\n\n— ' + data.name + ' (' + data.email + ')');
+                const line = print("If nothing opened, click here: ", 'dim');
+                const a = document.createElement('a');
+                a.href = href;
+                a.textContent = 'send_message.eml';
+                line.appendChild(a);
+                print("Type 'restart' to compose another.", 'dim');
+                input.placeholder = 'restart';
+                window.location.href = href;
+            }
+
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                if (busy || mode === 'boot') return;
+                const value = input.value.trim();
+                input.value = '';
+                echo(value);
+                const cmd = value.toLowerCase();
+
+                if (cmd === 'help') {
+                    print('help     show this list', 'dim');
+                    print('clear    clear the screen', 'dim');
+                    print('restart  start a new message', 'dim');
+                    print('email    show direct address', 'dim');
+                    return;
+                }
+                if (cmd === 'clear') {
+                    out.textContent = '';
+                    if (mode === 'form') ask();
+                    return;
+                }
+                if (cmd === 'restart') { print('Session reset.', 'warn'); restart(); return; }
+                if (cmd === 'email') { print('Direct line: ' + CONTACT_EMAIL, 'ok'); return; }
+
+                if (mode === 'form') {
+                    if (!value) { print('ERR: input required.', 'err'); return; }
+                    const s = steps[step];
+                    const result = s.check ? s.check(value) : true;
+                    if (result !== true) { print(result, 'err'); return; }
+                    data[s.key] = value;
+                    step++;
+                    if (step < steps.length) {
+                        ask();
+                    } else {
+                        mode = 'confirm';
+                        print('Transmit message to ' + CONTACT_EMAIL + '? (y/n)', 'warn');
+                        input.placeholder = 'y / n';
+                    }
+                } else if (mode === 'confirm') {
+                    if (cmd === 'y' || cmd === 'yes') transmit();
+                    else if (cmd === 'n' || cmd === 'no') { print('Transmission aborted.', 'err'); restart(); }
+                    else print("Please answer 'y' or 'n'.", 'err');
+                } else {
+                    print("Unknown command. Type 'help'.", 'err');
+                }
+            });
+
+            term.addEventListener('click', e => {
+                if (e.target.tagName !== 'A' && !window.getSelection().toString()) input.focus({ preventScroll: true });
+            });
+
+            const obs = new IntersectionObserver((entries, o) => {
+                if (!entries[0].isIntersecting) return;
+                o.disconnect();
+                boot();
+            }, { threshold: 0.3 });
+            obs.observe(term);
+        })();
+    </script>
+</body>
+</html>
